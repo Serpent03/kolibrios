@@ -116,7 +116,15 @@ draw_window:
 ; Data can be freely mixed with code to any parts of the image.
 ; Only the header information is required at the beginning of the image.
 
-title   db  "this is  the title.", 0x0
-text    db  "interesting, it's not recognizing the zero??", 0xA, 0xC, 0x0
+title   db  "RSS READER", 0x0
+text    db  ">READ XML", 0xA, 0xD
+        db  ">PARSE XML", 0xA, 0xD
+        db  ">DISPLAY CONTENT", 0xA, 0xD
+        db  ">CALL XML FROM NET", 0xA, 0xD, 0x0
 
-I_END:
+; @todo
+; - How do I parse files?
+; - How do I utilize the internet drivers?
+; - Scope of C being involved?
+
+I_END: ; this is extremely important! without this, we won't get our ending address.
