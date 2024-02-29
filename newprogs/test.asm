@@ -28,21 +28,15 @@ event_wait:
         mov     eax, 10                 ; function 10 : wait until event
         mcall                           ; event type is returned in eax
 
-        cmp     eax, 1                  ; Event redraw request ?
-        je      red                     ; Expl.: there has been activity on screen and
-                                        ; parts of the applications has to be redrawn.
+        ; @todo call mcall 70, < PARAM > for reading file
 
-        cmp     eax, 2                  ; Event key in buffer ?
-        je      key                     ; Expl.: User has pressed a key while the
-                                        ; app is at the top of the window stack.
-
-        cmp     eax, 3                  ; Event button in buffer ?
-        je      button                  ; Expl.: User has pressed one of the
-                                        ; applications buttons.
-
-        jmp     event_wait
+        ; jmp     event_wait
 
 ;  The next section reads the event and processes data.
+
+close_prog:
+        mov     eax,-1                  ; Function -1 : close this program
+        mcall
 
 red:                                    ; Redraw event handler
         call    draw_window             ; We call the window_draw function and
