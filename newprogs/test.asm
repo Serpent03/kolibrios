@@ -19,90 +19,17 @@ dd 0, 0
 include 'macros.inc'
 
 START:                                  ; start of execution
-        call    draw_window             ; draw the window
-
-; After the window is drawn, it's practical to have the main loop.
-; Events are distributed from here.
 
 event_wait:
-        mov     eax, 10                 ; function 10 : wait until event
-        mcall                           ; event type is returned in eax
-
         ; @todo call mcall 70, < PARAM > for reading file
 
-        ; jmp     event_wait
+        mcall   70, INFOSTRUCT
+        mov     ebx, [BUFFER]
 
-;  The next section reads the event and processes data.
 
 close_prog:
         mov     eax,-1                  ; Function -1 : close this program
         mcall
-
-red:                                    ; Redraw event handler
-        call    draw_window             ; We call the window_draw function and
-        jmp     event_wait              ; jump back to event_wait
-
-key:                                    ; Keypress event handler
-        mov     eax, 2                  ; The key is returned in ah. The key must be
-        mcall                           ; read and cleared from the system queue.
-        jmp     event_wait              ; Just read the key, ignore it and jump to event_wait.
-
-button:                                 ; Buttonpress event handler
-        mov     eax,17                  ; The button number defined in window_draw
-        mcall                           ; is returned to ah.
-
-        cmp     ah,1                    ; button id=1 ?
-        jne     noclose
-        mov     eax,-1                  ; Function -1 : close this program
-        mcall
-
-noclose:
-        jmp     event_wait              ; This is for ignored events, useful at development
-
-;  *********************************************
-;  ******  WINDOW DEFINITIONS AND DRAW  ********
-;  *********************************************
-;
-;  The static window parts are drawn in this function. The window canvas can
-;  be accessed later from any parts of this code (thread) for displaying
-;  processes or recorded data, for example.
-;
-;  The static parts *must* be placed within the fn 12 , ebx = 1 and ebx = 2.
-
-draw_window:
-        mov     eax, 12                 ; function 12: tell os about windowdraw
-        mov     ebx, 1                  ; 1, start of draw
-        mcall
-
-        mov     eax, 0                  ; function 0 : define and draw window
-        mov     ebx, 100 * 65536 + 300  ; [x start] *65536 + [x size]
-        mov     ecx, 100 * 65536 + 120  ; [y start] *65536 + [y size]
-        mov     edx, 0x14ccfffc         ; color of work area RRGGBB
-                                        ; 0x02000000 = window type 4 (fixed size, skinned window)
-        mov     esi, 0x808899ff         ; color of grab bar  RRGGBB
-                                        ; 0x80000000 = color glide
-        mov     edi, title
-        mcall
-
-        mov     ebx, 25 * 65536 + 35    ; draw info text with function 4
-        mov     ecx, 0x224466
-        mov     edx, text
-        mov     esi, 40
-        mov     eax, 4
-
-  .newline:                             ; text from the DATA AREA
-        mcall
-        add     ebx, 10
-        add     edx, 40
-        cmp     byte[edx], 0
-        jne     .newline
-
-        mov     eax, 12                 ; function 12:tell os about windowdraw
-        mov     ebx, 2                  ; 2, end of draw
-        mcall
-
-        ret
-
 ;  *********************************************
 ;  *************   DATA AREA   *****************
 ;  *********************************************
@@ -110,11 +37,13 @@ draw_window:
 ; Data can be freely mixed with code to any parts of the image.
 ; Only the header information is required at the beginning of the image.
 
-title   db  "RSS READER", 0x0
-text    db  ">READ XML", 0xA, 0xD
-        db  ">PARSE XML", 0xA, 0xD
-        db  ">DISPLAY CONTENT", 0xA, 0xD
-        db  ">CALL XML FROM NET", 0xA, 0xD, 0x0
+INFOSTRUCT:
+        dd 0
+        dd 0
+        dd 0
+        dd 1
+        dd BUFFER
+        db  "/hd0/1/hw.txt", 0x0
 
 ; @todo
 ; - How do I parse files?
@@ -122,3 +51,5 @@ text    db  ">READ XML", 0xA, 0xD
 ; - Scope of C being involved?
 
 I_END: ; this is extremely important! without this, we won't get our ending address.
+
+BUFFER: rb 64
