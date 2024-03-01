@@ -24,24 +24,28 @@ event_wait:
         ; @todo call mcall 70, < PARAM > for reading file
 
         mcall   70, INFOSTRUCT
-        mov     ebx, [BUFFER]
+        mov     eax, BUFFER
+
+print_buf:
+        add     eax, 1
+        mov     ebx, [eax - 1]
+        cmp     ebx, 0
+        jnz     print_buf
+
 
 
 close_prog:
-        mov     eax,-1                  ; Function -1 : close this program
+        mov     eax, -1                  ; Function -1 : close this program
         mcall
 ;  *********************************************
 ;  *************   DATA AREA   *****************
 ;  *********************************************
-;
-; Data can be freely mixed with code to any parts of the image.
-; Only the header information is required at the beginning of the image.
 
 INFOSTRUCT:
         dd 0
         dd 0
         dd 0
-        dd 1
+        dd 63 ; does this go to EOF or EOL?
         dd BUFFER
         db  "/hd0/1/hw.txt", 0x0
 
@@ -50,6 +54,6 @@ INFOSTRUCT:
 ; - How do I utilize the internet drivers?
 ; - Scope of C being involved?
 
-I_END: ; this is extremely important! without this, we won't get our ending address.
+I_END: ; this is extremely important! without this, we won't get our
 
-BUFFER: rb 64
+BUFFER: db 64 dup(0)
