@@ -32,8 +32,6 @@ print_buf:
         cmp     ebx, 0
         jnz     print_buf
 
-
-
 close_prog:
         mov     eax, -1                  ; Function -1 : close this program
         mcall
@@ -48,11 +46,6 @@ INFOSTRUCT:
         dd 63 ; does this go to EOF or EOL?
         dd BUFFER
         db  "/hd0/1/hw.txt", 0x0
-
-; @todo
-; - How do I parse files?
-; - How do I utilize the internet drivers?
-; - Scope of C being involved?
 
 I_END: ; this is extremely important! without this, we won't get our
 
